@@ -1,0 +1,78 @@
+database: data/trend_radar.db
+
+# 每日窗口 / 趋势窗口
+window_hours: 24
+lookback_days: 7
+
+http:
+  timeout_seconds: 20
+  retries: 2
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) TrendRadar/1.0"
+
+fetch:
+  max_workers: 8
+  summary_max_chars: 500
+  # --debug 时每个 source 最多保留多少条
+  debug_limit_per_source: 10
+
+# ---------- Phase 2: 筛选 ----------
+filter:
+  window_days: 7            # 分析窗口：只筛选这段时间内的内容
+
+fast_filter:
+  # Fast Filter 是 Signal Gate，不是最终排名：过线的全部交给聚类，由聚类之后的 Global Ranking 决定谁更值得讲。
+  keep_threshold: 55        # 分数 >= 该值成为 signal
+  min_threshold: 45         # signal 不足时阈值最低降到这里
+  min_candidates: 20
+  max_signals_for_clustering: 100   # 安全上限，正常不应触发
+  batch_size: 15            # 每次 API 调用评估多少条
+  max_workers: 3            # 同时运行几个 codex exec
+  debug_max_batches: 2      # --debug 时最多跑几批
+  # 总分 = Σ 维度分(0~5) × 权重，满分 100
+  weights:
+    change_signal: 5
+    ordinary_people: 5
+    story_potential: 4
+    trend_potential: 4
+    visual_potential: 2
+
+# ---------- Phase 3: Event 聚类 / Global Ranking / Trend ----------
+cluster:
+  research_top_n: 10        # Global Ranking 后进入 Research Queue 的 Event 数
+  # Event 总分 = Σ 维度分(0~5) × 权重，满分 100
+  weights:
+    audience_relevance: 5
+    change_magnitude: 4
+    story_potential: 4
+    trend_potential: 3
+    evidence_strength: 2
+    visual_potential: 2
+
+# ---------- 模型运行时：Codex CLI（ChatGPT 登录，不需要 API key） ----------
+# 模型和推理强度只在 .env 里配置：CODEX_MODEL / CODEX_REASONING_EFFORT
+codex:
+  binary: codex
+  timeout_seconds: 900      # 单次 codex exec 的超时（high effort 比较慢）
+
+# ---------- Video Pipeline V0 ----------
+video:
+  capture_macos_settings: false  # 仅在制作系统设置相关演示时启用
+  width: 1080
+  height: 1920
+  fps: 30
+  min_seconds: 45
+  max_seconds: 60
+  target_seconds: 52          # 配音超出范围时，改稿的目标时长
+  max_length_revisions: 2
+  scene_gap_seconds: 0.12     # 场与场之间的停顿
+  scene_tail_seconds: 0.18
+  caption_max_chars: 13       # 每屏字幕最多多少字
+  research_max_searches: 6
+  last30days:
+    enabled: true           # 选定事件后，补充近 30 天的公开讨论线索
+    timeout_seconds: 75
+  tts:
+    provider: edge-tts        # 统一接口 TTSProvider，V0 只实现这一个
+    voice: zh-CN-YunxiNeural  # 年轻男声，偏自然口语
+    rate: "+6%"
+    pitch: "+0Hz"

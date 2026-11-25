@@ -1,0 +1,121 @@
+# 所有来源都在这里增删，代码里不写死。
+# type: 对应 src/fetchers/ 里注册的 fetcher（hackernews / github_trending / rss）
+# tier: 来源可信度分层（1 官方一手 / 2 专业媒体 / 3 社区信号）
+# enabled: false 可临时关闭
+
+sources:
+
+  # ---------- Source A: Hacker News ----------
+  - name: Hacker News
+    type: hackernews
+    category: community
+    tier: 3
+    min_points: 50        # 过去 window 内至少多少分才收
+    max_items: 100
+
+  # ---------- Source B: GitHub Trending ----------
+  - name: GitHub Trending
+    type: github_trending
+    category: opensource
+    tier: 3
+    since: daily
+    languages: [""]       # "" = 全部语言；可加 python / typescript 等
+
+  # ---------- Source C: 科技 / AI 媒体 ----------
+  - name: TechCrunch
+    type: rss
+    category: tech
+    tier: 2
+    url: https://techcrunch.com/feed/
+
+  - name: The Verge
+    type: rss
+    category: tech
+    tier: 2
+    url: https://www.theverge.com/rss/index.xml
+
+  - name: Ars Technica
+    type: rss
+    category: tech
+    tier: 2
+    url: https://feeds.arstechnica.com/arstechnica/index
+
+  - name: MIT Technology Review
+    type: rss
+    category: science
+    tier: 2
+    url: https://www.technologyreview.com/feed/
+
+  - name: Wired
+    type: rss
+    category: tech
+    tier: 2
+    url: https://www.wired.com/feed/rss
+
+  - name: 404 Media
+    type: rss
+    category: internet_culture
+    tier: 2
+    url: https://www.404media.co/rss/
+
+  - name: Rest of World
+    type: rss
+    category: global
+    tier: 2
+    url: https://restofworld.org/feed/latest/
+
+  # ---------- Source D: 公司官方（一手信息） ----------
+  # Anthropic / Tesla 没有可用的官方 RSS，V1 先不收。
+  - name: OpenAI
+    type: rss
+    category: official
+    tier: 1
+    url: https://openai.com/news/rss.xml
+
+  - name: Google
+    type: rss
+    category: official
+    tier: 1
+    url: https://blog.google/rss/
+
+  - name: Microsoft
+    type: rss
+    category: official
+    tier: 1
+    url: https://blogs.microsoft.com/feed/
+
+  - name: Meta
+    type: rss
+    category: official
+    tier: 1
+    url: https://about.fb.com/news/feed/
+
+  - name: Apple
+    type: rss
+    category: official
+    tier: 1
+    url: https://www.apple.com/newsroom/rss-feed.rss
+
+  - name: NVIDIA
+    type: rss
+    category: official
+    tier: 1
+    url: https://blogs.nvidia.com/feed/
+
+  - name: Amazon
+    type: rss
+    category: official
+    tier: 1
+    url: https://www.aboutamazon.com/news/feed
+
+  - name: Cloudflare
+    type: rss
+    category: official
+    tier: 1
+    url: https://blog.cloudflare.com/rss/
+
+  - name: Stripe
+    type: rss
+    category: official
+    tier: 1
+    url: https://stripe.com/blog/feed.rss
